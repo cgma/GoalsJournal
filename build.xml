@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<project default="main">
+	<property file="build.properties"/>
+	
+    <target name="main" depends="init, compile, extractLibs, copyResources, dist, finish" description="Main target">
+        <echo message="Building GoalsJournal!" level="warning"/>
+    </target>
+  
+	<target name="init" depends="clean">
+	    <tstamp/>
+	</target>
+	
+	<target name="finish">
+		<delete dir="${temp}"/>
+	</target>
+	
+	<target name="extractLibs">
+		<unzip dest="${temp}" overwrite="false">
+            <fileset dir="${lib}">
+              <include name="**/*.jar"/>
+            </fileset>	
+		</unzip>
+		
+	</target>
+	
+	<target name="copyResources">
+		<copy todir="${temp}">
+			<fileset dir="${src}">
+				<exclude name="**/*.java"/>
+				<!--globmapper from="*" to="*.bak"/--> 
+			</fileset>
+		</copy>
+	</target>
+	
+    <target name="compile" description="Compilation target">
+    	<mkdir dir="${build}"/>
+        <javac srcdir="${src}" destdir="${build}" source="1.6">
+        	<classpath>
+	            <fileset dir="${lib}">
+	              <include name="**/*.jar"/>
+	            </fileset>	
+    		</classpath>
+        </javac>
+    	
+    </target>
+  
+	
+	<target name="dist" description="Compression target">
+		<mkdir dir="${dist}"/>
+		
+		<jar destfile="${dist}/GoalsJournal.jar">
+    		    		
+	    	<fileset dir="${build}"
+				excludes="**/Test.class"
+	    	/>
+    	
+    		<fileset dir="${temp}/"/>
+    
+    		<manifest>
+    			<attribute name="Main-Class" 				value="jmydays.JMyDays"/>
+    			<attribute name="Class-Path"	 			value="."/>
+	      		<attribute name="Built-By" 					value="${user.name}"/>
+      			<attribute name="Implementation-Vendor" 	value="CGMA Inc."/>
+      			<attribute name="Implementation-Title" 		value="GoalsJournal-JMyDays"/>
+    			<attribute name="Implementation-Version" 	value="0.6 beta3"/>
+			</manifest>
+    	
+  		</jar>
+        
+	</target>
+  
+	<target name="clean" description="Clean up" >
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+	
+</project>
