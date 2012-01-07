@@ -1,0 +1,9 @@
+GoalsJournal (before: JMyDays) is a Daily habit tracker inspired on www.joesgoals.com
+
+>Data is stored in a SQLite DB file. 
+>Avility to export to text files.
+>Beta password encryption functions.
+
+Build with Ant.
+Run: java -jar GoalsJournal.jar
+
