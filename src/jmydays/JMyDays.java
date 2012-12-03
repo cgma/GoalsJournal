@@ -2755,7 +2755,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
 
 
         //LAYOUT... (Testing MiG)
-       // configActvsDialog.setLayout( new net.miginfocom.swing.MigLayout("insets 15 15 15 15") );
+        configActvsDialog.setLayout( new net.miginfocom.swing.MigLayout("insets 15 15 15 15") );
         configActvsDialog.add(actvJLabel, "wrap 5mm");
         configActvsDialog.add( new JLabel( recursosTexto.getString("actvDlg1SelComp") ), "span 2 1, wrap" );
         for (int i = 0; i < jRdBtns.length; i++) {
