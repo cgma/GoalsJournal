@@ -124,11 +124,14 @@ public class Util implements jmydays.JMyDaysConstants {
                 for (int i = 0; i < labels.length; i++) {
                     if( labels[i] != null ){
                         //bfw.write(labels[i] + ": " + ( Integer.valueOf(labelsStat[i]) > 0 ? checked : missed) );
-                        activities = "{ \"type\" : \"checkbox\", \"name\" : \"" + labels[i] + "\", \"value\" : \""
-                                + ( Integer.valueOf(labelsStat[i]) > 0 ? "true" : "false") + "\" }";
+                        activities += "{ \"type\" : \"checkbox\", \"name\" : \"" + labels[i] + "\", \"value\" : \""
+                                + ( Integer.valueOf(labelsStat[i]) > 0 ? "true" : "false") + "\" },";
                     }
                 }
             }
+
+            activities = activities.substring( 0, activities.length()-1); //remove las ','
+
             activities += " ]";
 
 
@@ -172,6 +175,5 @@ public class Util implements jmydays.JMyDaysConstants {
     	}
     
     }
-    
-    
+
 }
