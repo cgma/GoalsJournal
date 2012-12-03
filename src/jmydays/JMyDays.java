@@ -120,67 +120,26 @@
 
 package jmydays;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-//import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-//import java.awt.event.ItemEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
+import jmydays.beans.RegistrosBean;
+import jmydays.datapicker.DatePicker;
+import jmydays.util.CryptoUtils;
+import jmydays.util.Database;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-
+//import java.awt.Dialog;
+//import java.awt.event.ItemEvent;
 //import java.awt.event.WindowFocusListener;
 //import javax.swing.JComponent;
 //import javax.swing.JFrame;
 //import javax.swing.JSlider;
-
-
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import jmydays.beans.RegistrosBean;
-import jmydays.datapicker.DatePicker;
-import jmydays.util.Database;
 //import java.awt.event.ItemEvent;
 //import java.awt.event.ItemListener;
-
-import jmydays.util.CryptoUtils;
 
 /**
  *
@@ -946,7 +905,6 @@ public class JMyDays implements JMyDaysConstants, Runnable {
 
     /**
      * Method that shows or hides rows of labels and checkboxes according to the currently shown Day.
-     * @param starPoint
      */
     private void showActvRows(final int numLabelsToShow){
 
@@ -1147,9 +1105,6 @@ public class JMyDays implements JMyDaysConstants, Runnable {
 
     /**
      * Method that updates screen labels, and ids for labels.
-     *
-     * @param id_cbs
-     * @return
      */
     private boolean updateScreenTodaysLabelsAndIds(final String id_actv, final int daysShownActivityRowsNum){
 
@@ -1375,8 +1330,8 @@ public class JMyDays implements JMyDaysConstants, Runnable {
 
     /**
      * Inserts in DB the specified component's text, according to data provided by component and currecntly selected date.
-     * @param compDayRoll: Indica numero de dias separados de la fecha actual: Prop�sito, facilitar el calculo de la fecha del JTextPane que se envia.
-     * @param jTextPanes, arreglo, en caso de que la funcion reciba mas de uno.
+     ** compDayRoll: Indica numero de dias separados de la fecha actual: Prop�sito, facilitar el calculo de la fecha del JTextPane que se envia.
+     ** jTextPanes, arreglo, en caso de que la funcion reciba mas de uno.
      * @return
      */
     private boolean updateInDBDayEntry(final String compName){
@@ -1718,7 +1673,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
      * Method that tries to obtain 3 days from the database, if one is missing it calls a method to inicialize that entry.
      * It also calls the methods to display checkbox contents, labels (only for middle day) and texpane contents.
      * @param updateDate : Date object for the middle day.
-     * @param jTextPane : Var-arg with the JTextPanes used to know how many days to consult from DB.
+     * @param myJTextPane : Var-arg with the JTextPanes used to know how many days to consult from DB.
      * @return
      */
     private boolean updateFromDBAllByTextPane(Date updateDate, MyJTextPane[] myJTextPane){
@@ -2429,7 +2384,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
     /**
      * Goes back or advances through history, registers current string for redo.
      * @param currentStr : last string before undo or redo.
-     * @param undo (true=undo, false=redo)
+     * undo (true=undo, false=redo)
      */
     private String typedHistoryChange(final String componentName, final String currentStr, final boolean undoCommand){
         String popedStr = currentStr; //just for more clarity
@@ -2815,9 +2770,6 @@ public class JMyDays implements JMyDaysConstants, Runnable {
     /**
      * For a given button group and a button array, this method returns the selected button number in the button array.
      * If no button is selected, -1 is returned.
-     * @param btnGpo
-     * @param jRBtn
-     * @return
      */
     public int getSelectedBtnFromBtnGrp(final javax.swing.ButtonGroup btnGpo, final javax.swing.JRadioButton jRBtn[]){
         for (int i = 0; i < jRBtn.length; i++) {
@@ -3275,8 +3227,8 @@ public class JMyDays implements JMyDaysConstants, Runnable {
                 	}
                 }
 
-                
-                if( !jmydays.util.Util.export2FormatedTxtFile( resultSet.getString("id_fecha"),
+                //export2FormatedTxtFile
+                if( !jmydays.util.Util.export2FormatedJsonFile( resultSet.getString("id_fecha"),
                                                          labels,
                                                          ( resultSet.getString("cbs") != null ? resultSet.getString("cbs").split(ACTV_VAL_DELIM_STR_REGEX) : new String[0]),
                                                          texto
@@ -3838,7 +3790,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
 
     /**
      * Copies values from CheckBoxes or Sliders into the TextField.
-     * @param compnent
+     * @param comp
      */
     private void copyCheckboxAndSlidderValuesToTextfield(final Component comp){
     	

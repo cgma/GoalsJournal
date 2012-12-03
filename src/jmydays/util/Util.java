@@ -4,14 +4,14 @@
  */
 package jmydays.util;
 
+import javax.swing.*;
 import java.io.BufferedInputStream;
-//import java.io.BufferedWriter;
-//import java.io.File;
-//import java.util.Enumeration;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.swing.JOptionPane;
+//import java.io.BufferedWriter;
+//import java.io.File;
+//import java.util.Enumeration;
 
 /**
  *
@@ -46,11 +46,17 @@ public class Util implements jmydays.JMyDaysConstants {
     }
 
     public static boolean export2FormatedTxtFile(final String date, final String[] labels, final String[] labelsStat, final String text){
+        //Check if skip creating file
+        if( labels.length == 0 && (text == null || text.trim().length() == 0) ){
+            return true;
+        }
+
         final String checked = recursosTexto.getString("txtFileChecked");
         final String missed = recursosTexto.getString("txtFileMissed");
 
         final java.io.BufferedWriter bfw;
         final java.io.FileWriter fw;
+
         try{
         	fw = new java.io.FileWriter(date+".txt");
             bfw = new java.io.BufferedWriter( fw );
@@ -62,7 +68,7 @@ public class Util implements jmydays.JMyDaysConstants {
             if( labels.length == labelsStat.length ){
                 for (int i = 0; i < labels.length; i++) {
                 	if( labels[i] != null ){
-	                    bfw.write(labels[i] + ": " + (labelsStat[i].equals("1") ? checked : missed) );
+	                    bfw.write(labels[i] + ": " + ( Integer.valueOf(labelsStat[i]) > 0 ? checked : missed) );
 	                    bfw.newLine();
                 	}
                 }
@@ -86,6 +92,63 @@ public class Util implements jmydays.JMyDaysConstants {
             javax.swing.JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+
+        return true;
+    }
+
+    //Sample: { "_id" : "2012-09-11", "activities" : [ { "type" : "text", "name" : "My project", "value" : "!!! =)" } ], "notes" : "First notes! Oh yeah!\n =)" }
+    public static boolean export2FormatedJsonFile(final String date, final String[] labels, final String[] labelsStat, final String text){
+        //Check if skip creating file
+        if( labels.length == 0 && (text == null || text.trim().length() == 0) ){
+            return true;
+        }
+
+        final String checked = recursosTexto.getString("txtFileChecked");
+        final String missed = recursosTexto.getString("txtFileMissed");
+
+        final java.io.BufferedWriter bfw;
+        final java.io.FileWriter fw;
+        try{
+            fw = new java.io.FileWriter(date+".txt");
+            bfw = new java.io.BufferedWriter( fw );
+
+            String jsonStr = "";
+            String id = "";
+            String activities = "";
+            String notes = "";
+
+            id = date;
+
+            activities = "[ ";
+            if( labels.length == labelsStat.length ){
+                for (int i = 0; i < labels.length; i++) {
+                    if( labels[i] != null ){
+                        //bfw.write(labels[i] + ": " + ( Integer.valueOf(labelsStat[i]) > 0 ? checked : missed) );
+                        activities = "{ \"type\" : \"checkbox\", \"name\" : \"" + labels[i] + "\", \"value\" : \""
+                                + ( Integer.valueOf(labelsStat[i]) > 0 ? "true" : "false") + "\" }";
+                    }
+                }
+            }
+            activities += " ]";
+
+
+            //bfw.write(text);
+            notes = text;
+
+            jsonStr = "{ \"_id\" : \"" + id + "\", \"activities\" : " + activities + ", \"notes\" : \"" + text + "\" }";
+
+            System.out.println(jsonStr);
+
+            bfw.write(jsonStr);
+
+            bfw.close();
+        }catch(IOException ioe){
+            System.out.println("IOException message when closing file: " + ioe.getMessage() );
+            javax.swing.JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        System.out.println("");
 
         return true;
     }
