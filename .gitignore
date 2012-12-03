@@ -1,0 +1,4 @@
+bin/
+*.s3db
+configs.dat
+

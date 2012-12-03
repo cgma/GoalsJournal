@@ -2299,6 +2299,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
             for (int i = 0; i < comp.length; i++) {
                 comp[i].addMouseListener( (MouseListener)evLi );
             }
+            // return; //to add a single listener? ...
         }else if( evLi instanceof java.awt.event.KeyListener ){
             for (int i = 0; i < comp.length; i++) {
                 comp[i].addKeyListener( (KeyListener)evLi );
@@ -3779,65 +3780,99 @@ public class JMyDays implements JMyDaysConstants, Runnable {
 
     /**
      * Class with action listener for all Slidders, Textboxes and Checkboxes of activities.
+     * Focus listener is used for special cases when input wasn't supplied from a mouse click.
      */
-    class ActvCompActionEvents implements java.awt.event.FocusListener{
+    class ActvCompActionEvents implements java.awt.event.FocusListener, java.awt.event.MouseListener {
 
-        @Override
-        public void focusGained(java.awt.event.FocusEvent fe){}
-
-        /**
-         * On focus lost, updates colors.
-         * @param fe
-         */
-        @Override
-        public void focusLost(java.awt.event.FocusEvent fe) {
-			updateScreenActvLabelColors(); //on focus lost, for all CheckBoxes or Sliders, update colors
-		}
+    	@Override
+    	public void focusLost(FocusEvent e) {
+    		updateScreenActvLabelColors(); // on focus lost, for all CheckBoxes or Sliders, update colors
+    	}
     	
+    	@Override public void focusGained(FocusEvent e) {}
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        	updateScreenActvLabelColors(); // on focus lost, for all CheckBoxes or Sliders, update colors
+        }
+
+		@Override public void mouseClicked(MouseEvent e) { }
+
+		@Override public void mousePressed(MouseEvent e) { }
+
+		@Override public void mouseEntered(MouseEvent e) { }
+
+		@Override public void mouseExited(MouseEvent e) { }
+
     }
+    
     /**
      * Class to be used ONLY to add a Focus listener ONLY TO CHECKBOXES OR SLIDERS.
+     * Focus listener is used for special cases when input wasn't supplied from a mouse click.
      */
-    class ActvCompValueCopyEvents implements java.awt.event.FocusListener{
+    class ActvCompValueCopyEvents implements java.awt.event.FocusListener, java.awt.event.MouseListener {
+
+        @Override public void focusGained(java.awt.event.FocusEvent fe){}
 
         @Override
-        public void focusGained(java.awt.event.FocusEvent fe){}
-
-        /**
-         * On focus lost, copies values from CheckBoxes or Sliders into the TextField.
-         * @param fe
-         */
-        @Override
-        public void focusLost(java.awt.event.FocusEvent fe) {
-            final Component comp = fe.getComponent();
-            if( comp instanceof MyComponent ){
-                final MyComponent myComp = (MyComponent)comp;
-                final int actvY = myComp.getCompRelationY(); //First time use!! LOL! (I was thinking I wouln'd use this.)
-                final String txtFldVal1;
-                final String txtFldVal2;
-                final String txtFldVal3;
-                if( comp instanceof JCheckBox){
-                    txtFldVal1 = jCheckBoxesCol1[actvY].isSelected() ? ACTV_CB_CHECKED_VAL : ACTV_CB_UNCHECKED_VAL;
-                    txtFldVal2 = jCheckBoxesCol2[actvY].isSelected() ? ACTV_CB_CHECKED_VAL : ACTV_CB_UNCHECKED_VAL;
-                    txtFldVal3 = jCheckBoxesCol3[actvY].isSelected() ? ACTV_CB_CHECKED_VAL : ACTV_CB_UNCHECKED_VAL;
-                }else if( comp instanceof JSlider ){
-                    txtFldVal1 = String.valueOf( jSlidersCol1[actvY].getValue() );
-                    txtFldVal2 = String.valueOf( jSlidersCol2[actvY].getValue() );
-                    txtFldVal3 = String.valueOf( jSlidersCol3[actvY].getValue() );
-                }else{
-                    //Invalid component...
-                    return;
-                }
-
-                jTextFieldsCol1[actvY].setText( txtFldVal1 );
-                jTextFieldsCol2[actvY].setText( txtFldVal2 );
-                jTextFieldsCol3[actvY].setText( txtFldVal3 );
-            }
-
+        public void focusLost(java.awt.event.FocusEvent fe) { 
+        	copyCheckboxAndSlidderValuesToTextfield(fe.getComponent());
         }//focusLost
 
+        @Override
+        public void mouseReleased(MouseEvent me) { 
+        	copyCheckboxAndSlidderValuesToTextfield(me.getComponent());
+        }
+
+		@Override public void mouseClicked(MouseEvent e) { }
+
+		@Override public void mousePressed(MouseEvent e) { }
+
+		@Override public void mouseEntered(MouseEvent e) { }
+
+		@Override public void mouseExited(MouseEvent e) { }
+
+		
+		
     }
 
+    /**
+     * Copies values from CheckBoxes or Sliders into the TextField.
+     * @param compnent
+     */
+    private void copyCheckboxAndSlidderValuesToTextfield(final Component comp){
+    	
+        //final Component comp = event.getComponent();
+        if( comp instanceof MyComponent ){
+            final MyComponent myComp = (MyComponent)comp;
+            final int actvY = myComp.getCompRelationY(); //First time use!! LOL! (I was thinking I wouln'd use this.)
+            final String txtFldVal1;
+            final String txtFldVal2;
+            final String txtFldVal3;
+            if( comp instanceof JCheckBox){
+                txtFldVal1 = jCheckBoxesCol1[actvY].isSelected() ? ACTV_CB_CHECKED_VAL : ACTV_CB_UNCHECKED_VAL;
+                txtFldVal2 = jCheckBoxesCol2[actvY].isSelected() ? ACTV_CB_CHECKED_VAL : ACTV_CB_UNCHECKED_VAL;
+                txtFldVal3 = jCheckBoxesCol3[actvY].isSelected() ? ACTV_CB_CHECKED_VAL : ACTV_CB_UNCHECKED_VAL;
+            }else if( comp instanceof JSlider ){
+                txtFldVal1 = String.valueOf( jSlidersCol1[actvY].getValue() );
+                txtFldVal2 = String.valueOf( jSlidersCol2[actvY].getValue() );
+                txtFldVal3 = String.valueOf( jSlidersCol3[actvY].getValue() );
+            }else if( comp instanceof JTextField ){
+            	//do nothing
+            	txtFldVal1 = "";
+            	txtFldVal2 = "";
+            	txtFldVal3 = "";
+            }else{
+                throw new RuntimeException("Invalid component!");
+                //return;
+            }
+            
+            jTextFieldsCol1[actvY].setText( txtFldVal1 );
+            jTextFieldsCol2[actvY].setText( txtFldVal2 );
+            jTextFieldsCol3[actvY].setText( txtFldVal3 );
+        }
+    }
+    
 
     //Failed Attemp to save all when exiting...
     /*
@@ -3846,4 +3881,19 @@ public class JMyDays implements JMyDaysConstants, Runnable {
     }
     */
 
+    /*
+	//HACK!!! To allow updates before running this fuction
+	Thread hackThread = new Thread( new Runnable(){
+		public void run() {
+			try {
+				Thread.currentThread().sleep(100);
+				//Do something...
+			} catch (InterruptedException ie) { 
+				System.err.println("Thread interrupted! " + ie.getMessage());
+			}
+		}
+	});
+	hackThread.start();
+     */
+    
 }
