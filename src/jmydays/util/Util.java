@@ -97,7 +97,7 @@ public class Util implements jmydays.JMyDaysConstants {
     }
 
     //Sample: { "_id" : "2012-09-11", "activities" : [ { "type" : "text", "name" : "My project", "value" : "!!! =)" } ], "notes" : "First notes! Oh yeah!\n =)" }
-    public static boolean export2FormatedJsonFile(final String date, final String[] labels, final String[] labelsStat, final String text){
+    public static boolean export2FormatedJsonFiles(final String date, final String[] labels, final String[] labelsStat, final String text){
         //Check if skip creating file
         if( labels.length == 0 && (text == null || text.trim().length() == 0) ){
             return true;
@@ -155,7 +155,15 @@ public class Util implements jmydays.JMyDaysConstants {
 
         return true;
     }
-    
+
+    public static boolean export2FormatedJsonSingleFile(final String date, final String[] labels, final String[] labelsStat, final String text){
+        //Check if skip creating file
+
+
+        return true;
+    }
+
+
     private static String osName = System.getProperty("os.name");
     
     public static OS getOS(){

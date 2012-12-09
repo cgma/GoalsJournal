@@ -128,6 +128,7 @@ import jmydays.util.Database;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -3206,6 +3207,10 @@ public class JMyDays implements JMyDaysConstants, Runnable {
             prepStatement = dbConnection.prepareStatement("SELECT * FROM registros WHERE id_fecha >='" + startDate + "' AND id_fecha <='" + endDate + "';");
 
             resultSet = prepStatement.executeQuery();
+
+            doSingleFileExport(resultSet, labelsMap);
+
+            /*
             String[] labels;
             while( resultSet.next() ){
 
@@ -3228,7 +3233,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
                 }
 
                 //export2FormatedTxtFile
-                if( !jmydays.util.Util.export2FormatedJsonFile( resultSet.getString("id_fecha"),
+                if( !jmydays.util.Util.export2FormatedJsonFiles( resultSet.getString("id_fecha"),
                                                          labels,
                                                          ( resultSet.getString("cbs") != null ? resultSet.getString("cbs").split(ACTV_VAL_DELIM_STR_REGEX) : new String[0]),
                                                          texto
@@ -3240,6 +3245,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
             	}
 
             }
+            */
             
             dbCloseResPrepStmtConn();
 
@@ -3254,10 +3260,103 @@ public class JMyDays implements JMyDaysConstants, Runnable {
     	}else{
     		javax.swing.JOptionPane.showMessageDialog(parentComp, recursosTexto.getString("txtExportFinishedErr"), recursosTexto.getString("msgTitleWarn"), JOptionPane.WARNING_MESSAGE);
     	}
-        	
 
     }
     
+    private void doSingleFileExport(final java.sql.ResultSet resultSet, java.util.Map<String, String> labelsMap) throws java.sql.SQLException{
+        String[] labels;
+
+        final String checked = recursosTexto.getString("txtFileChecked");
+        final String missed = recursosTexto.getString("txtFileMissed");
+
+        final java.io.BufferedWriter bfw;
+        final java.io.FileWriter fw;
+        try{
+            fw = new java.io.FileWriter("jmydays-entries-export-on-" + (new SimpleDateFormat("yyyyMMdd")).format(new Date()) + ".txt");
+            bfw = new java.io.BufferedWriter( fw );
+
+            String jsonStr = "";
+            String id = "";
+            String activities = "";
+            String notes = "";
+
+
+            labelsIterate: while( resultSet.next() ){
+
+                //getLabels
+                if( resultSet.getString("id_cbs") != null ){
+                    labels = resultSet.getString("id_cbs").split(ACTV_VAL_DELIM_STR_REGEX);
+                }else{
+                    labels = new String[]{};
+                }
+                //pasa del id al valor...
+                for (int i = 0; i < labels.length; i++) {
+                    labels[i] = labelsMap.get(labels[i]); //if null... luego vemos
+                }
+
+                String text = resultSet.getString("texto");
+                if( !isArrayWithContent(labels) && (text == null || text.trim().length() == 0) ){
+                    continue labelsIterate;
+                }
+
+                if( text != null && CryptoUtils.isStrCiphered(text) && isUsingPass ){
+                    text = CryptoUtils.decrypt( text );
+                }
+
+                final String[] labelsStat = ( resultSet.getString("cbs") != null ? resultSet.getString("cbs").split(ACTV_VAL_DELIM_STR_REGEX) : new String[0]);
+
+                final String dateKey = resultSet.getString("id_fecha");
+
+                id = dateKey;
+
+                activities = "[ ";
+                if( labels.length == labelsStat.length ){
+                    for (int i = 0; i < labels.length; i++) {
+                        if( labels[i] != null ){
+                            //bfw.write(labels[i] + ": " + ( Integer.valueOf(labelsStat[i]) > 0 ? checked : missed) );
+                            activities += " { \"type\" : \"checkbox\", \"name\" : \"" + labels[i] + "\", \"value\" : \""
+                                    + ( Integer.valueOf(labelsStat[i]) > 0 ? "true" : "false") + "\" },";
+                        }
+                    }
+                }
+
+                activities = activities.substring( 0, activities.length()-1); //remove las ','
+
+                activities += " ]";
+
+                notes = text.replaceAll("\\r?\\n", "\\\\n"); //replace line-breaks with literal line breaks
+
+                jsonStr = "{ \"_id\" : \"" + id + "\", \"activities\" : " + activities + ", \"notes\" : \"" + notes + "\" }";
+
+                bfw.write(jsonStr + "\n");
+
+            }
+
+            bfw.close();
+
+        }catch(IOException ioe){
+            System.out.println("IOException message when closing file: " + ioe.getMessage() );
+            javax.swing.JOptionPane.showMessageDialog(null, ioe.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+
+    public boolean isArrayWithContent(String[] strArray){
+
+        if( strArray == null || strArray.length == 0 ){
+            return false;
+        }
+
+        for(String str: strArray){
+            if( str != null ){
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
     private void showAboutDialog(javax.swing.JPanel jPanel){
         JOptionPane.showInternalMessageDialog(jPanel, ABOUT_MSG + recursosTexto.getString("currAppVersion"), recursosTexto.getString("aboutMenuItem1"), JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/ima.gif")));
     }
