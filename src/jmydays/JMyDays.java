@@ -3278,8 +3278,6 @@ public class JMyDays implements JMyDaysConstants, Runnable {
             String jsonStr = "";
             String id = "";
             String activities = "";
-            String notes = "";
-
 
             labelsIterate: while( resultSet.next() ){
 
@@ -3294,13 +3292,13 @@ public class JMyDays implements JMyDaysConstants, Runnable {
                     labels[i] = labelsMap.get(labels[i]); //if null... luego vemos
                 }
 
-                String text = resultSet.getString("texto");
-                if( !isArrayWithContent(labels) && (text == null || text.trim().length() == 0) ){
+                String notes = resultSet.getString("texto");
+                if( !isArrayWithContent(labels) && (notes == null || notes.trim().length() == 0) ){
                     continue labelsIterate;
                 }
 
-                if( text != null && CryptoUtils.isStrCiphered(text) && isUsingPass ){
-                    text = CryptoUtils.decrypt( text );
+                if( notes != null && CryptoUtils.isStrCiphered(notes) && isUsingPass ){
+                    notes = CryptoUtils.decrypt( notes );
                 }
 
                 final String[] labelsStat = ( resultSet.getString("cbs") != null ? resultSet.getString("cbs").split(ACTV_VAL_DELIM_STR_REGEX) : new String[0]);
@@ -3324,8 +3322,8 @@ public class JMyDays implements JMyDaysConstants, Runnable {
 
                 activities += " ]";
 
-                notes = text.replaceAll("\\r?\\n", "\\\\n"); //replace line-breaks with literal line breaks
-                notes = text.replaceAll("\\\"", "\\\\\""); //escape quotes within text
+                notes = notes.replaceAll("\\\"", "\\\\\""); //escape quotes within text
+                notes = notes.replaceAll("\\r?\\n", "\\\\n"); //replace line-breaks with literal line breaks
 
                 jsonStr = "{ \"_id\" : \"" + id + "\", \"activities\" : " + activities + ", \"notes\" : \"" + notes + "\" }";
 
