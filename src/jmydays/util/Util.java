@@ -156,14 +156,6 @@ public class Util implements jmydays.JMyDaysConstants {
         return true;
     }
 
-    public static boolean export2FormatedJsonSingleFile(final String date, final String[] labels, final String[] labelsStat, final String text){
-        //Check if skip creating file
-
-
-        return true;
-    }
-
-
     private static String osName = System.getProperty("os.name");
     
     public static OS getOS(){

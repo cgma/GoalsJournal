@@ -3325,6 +3325,7 @@ public class JMyDays implements JMyDaysConstants, Runnable {
                 activities += " ]";
 
                 notes = text.replaceAll("\\r?\\n", "\\\\n"); //replace line-breaks with literal line breaks
+                notes = text.replaceAll("\\\"", "\\\\\""); //escape quotes within text
 
                 jsonStr = "{ \"_id\" : \"" + id + "\", \"activities\" : " + activities + ", \"notes\" : \"" + notes + "\" }";
 
